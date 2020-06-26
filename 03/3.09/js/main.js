@@ -37,6 +37,17 @@ d3.json("data/buildings.json").then(function(data){
             return d.height;
         })])
         .range([0, height]);
+    var xAxisCall = d3.axisBottom(x);
+    var yAxisCall = d3.axisLeft(y);
+    g.append("g")
+        .attr("class","x axis")
+        .attr("transform","translate(0,"+height+")")
+        .call(xAxisCall)
+        .selectAll("text")
+            .attr("y",10)
+            .attr("x",-5)
+            .attr("text-anchor","end")
+            .attr("transform","rotate(-40)")
 
     var rects = g.selectAll("rect")
         .data(data)

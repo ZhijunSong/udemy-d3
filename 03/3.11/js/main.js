@@ -17,7 +17,7 @@ var g = d3.select("#chart-area")
         .attr("transform", "translate(" + margin.left 
             + ", " + margin.top + ")");
 
-// X Label
+//X Label
 g.append("text")
     .attr("class", "x axis-label")
     .attr("x", width / 2)
@@ -72,8 +72,8 @@ d3.json("data/buildings.json").then(function(data){
             return d + "m";
         });
     g.append("g")
-        .attr("class", "y-axis")
-        .call(yAxisCall);
+        .attr("class","y axis")
+        .call(yAxisCall)
 
     var rects = g.selectAll("rect")
         .data(data)
