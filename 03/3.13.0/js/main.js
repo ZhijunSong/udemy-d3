@@ -52,7 +52,7 @@ d3.json("data/revenues.json").then(function(data){
 			.domain([0,d3.max(data,function(d){
 				return d.revenue;
 			})])
-			.range([0,height]);
+			.range([height,0]);
 //xaxis set
 	var xAxisCall = d3.axisBottom(x);
     g.append("g")
@@ -66,7 +66,7 @@ d3.json("data/revenues.json").then(function(data){
             .attr("transform", "rotate(-40)");
 //yaxis
 	var yAxisCall = d3.axisLeft(y)
-			.ticks(5)
+			.ticks(10)
 			.tickFormat(function(d){
             return "$"+d;
         });
@@ -82,14 +82,14 @@ d3.json("data/revenues.json").then(function(data){
 		.append("rect")
 		.attr("width",x.bandwidth)
 		.attr("height",function(d){
-				return y(d.revenue);
+				return height-y(d.revenue);
 		})
 		.attr("x",function(d){
-				return d.month;
+				return x(d.month);
 
 		})
 		.attr("y",function(d){
-				return d.revenue;
+				return y(d.revenue);
 
 		})
 		.attr("fill","grey");
