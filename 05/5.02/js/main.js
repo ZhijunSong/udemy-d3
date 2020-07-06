@@ -61,6 +61,7 @@ d3.json("data/revenues.json").then(function(data){
 
     d3.interval(function(){
         update(data);
+        console.log(data);
     }, 1000);
     update(data);
 });

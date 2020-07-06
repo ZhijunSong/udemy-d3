@@ -8,7 +8,7 @@ var margin = { left:80, right:20, top:50, bottom:100 };
 
 var width = 600 - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom;
-    
+
 var g = d3.select("#chart-area")
     .append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -22,7 +22,8 @@ var xAxisGroup = g.append("g")
 
 var yAxisGroup = g.append("g")
     .attr("class", "y axis");
-
+var flag= true;
+var t = d3.transition().duration(750);
 // X Scale
 var x = d3.scaleBand()
     .range([0, width])
@@ -41,7 +42,7 @@ g.append("text")
     .text("Month");
 
 // Y Label
-g.append("text")
+var yLabel=g.append("text")
     .attr("y", -60)
     .attr("x", -(height / 2))
     .attr("font-size", "20px")
@@ -55,10 +56,14 @@ d3.json("data/revenues.json").then(function(data){
     // Clean data
     data.forEach(function(d) {
         d.revenue = +d.revenue;
+        d.profit = +d.profit;
+
     });
 
     d3.interval(function(){
-        update(data)
+      var newData = flag ? data : data.slice(1);
+        update(newData)
+        flag = !flag;
     }, 1000);
 
     // Run the vis for the first time
@@ -66,40 +71,64 @@ d3.json("data/revenues.json").then(function(data){
 });
 
 function update(data) {
+   var value = flag ? "revenue":"profit";//true return revenue value /false return to profit
+
     x.domain(data.map(function(d){ return d.month }));
-    y.domain([0, d3.max(data, function(d) { return d.revenue })])
+    y.domain([0, d3.max(data, function(d) { return d[value]})])
 
     // X Axis
     var xAxisCall = d3.axisBottom(x);
-    xAxisGroup.call(xAxisCall);;
+    xAxisGroup.transition(t).call(xAxisCall);;
 
     // Y Axis
     var yAxisCall = d3.axisLeft(y)
         .tickFormat(function(d){ return "$" + d; });
-    yAxisGroup.call(yAxisCall);
+    yAxisGroup.transition(t).call(yAxisCall);
 
     // JOIN new data with old elements.
     var rects = g.selectAll("rect")
-        .data(data);
+        .data(data,function(d){
+          return d.month;
+
+        });
 
     // EXIT old elements not present in new data.
-    rects.exit().remove();
+    rects.exit()
+        .attr("fill","red")
+    .transition(t)
+        .attr("y",y(0))
+        .attr("height",0)
+        .remove();
 
-    // UPDATE old elements present in new data.
-    rects
-        .attr("y", function(d){ return y(d.revenue); })
-        .attr("x", function(d){ return x(d.month) })
-        .attr("height", function(d){ return height - y(d.revenue); })
-        .attr("width", x.bandwidth);
+
+
+    // // UPDATE old elements present in new data.
+    // rects
+    //     .attr("y", function(d){ return y(d[value]); })
+    //     .attr("x", function(d){ return x(d.month) })
+    //     .attr("height", function(d){ return height - y(d[value]); })
+    //     .attr("width", x.bandwidth);
 
     // ENTER new elements present in new data.
     rects.enter()
         .append("rect")
-            .attr("y", function(d){ return y(d.revenue); })
+            .attr("fill", "grey")
+            .attr("y", y(0))
+            .attr("height", 0)
             .attr("x", function(d){ return x(d.month) })
-            .attr("height", function(d){ return height - y(d.revenue); })
             .attr("width", x.bandwidth)
-            .attr("fill", "grey");
+            // AND UPDATE old elements present in new data.
+            .merge(rects)
+            .transition(t)
+                .attr("x", function(d){ return x(d.month) })
+                .attr("width", x.bandwidth)
+                .attr("y", function(d){ return y(d[value]); })
+                .attr("height", function(d){ return height - y(d[value]); });
+
+
+
+    var label= flag ? "Revenue":"Profit";
+    yLabel.text(label);
+
 
 }
-
