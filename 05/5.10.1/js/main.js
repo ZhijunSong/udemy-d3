@@ -72,7 +72,7 @@ g.append("g")
 d3.json("data/data.json").then(function(data){
     console.log(data);
 
-    // Clean data
+    // // Clean data
     const formattedData = data.map(function(year){
         return year["countries"].filter(function(country){
             var dataExists = (country.income && country.life_exp);
@@ -83,6 +83,10 @@ d3.json("data/data.json").then(function(data){
             return country;            
         })
     });
+
+
+
+
 
     // Run the code every 0.1 second
     d3.interval(function(){
@@ -118,10 +122,10 @@ function update(data) {
         .attr("fill", function(d) { return continentColor(d.continent); })
         .merge(circles)
         .transition(t)
-            .attr("cy", function(d){ return y(d.life_exp); })
-            .attr("cx", function(d){ return x(d.income) })
+            .attr("cy", function(d){return y(d.life_exp);})
+            .attr("cx", function(d){return x(d.income)})
             .attr("r", function(d){ return Math.sqrt(area(d.population) / Math.PI) });
 
     // Update the time label
-    timeLabel.text(+(time + 1800))
+    timeLabel.text(+(time + 1800));
 }
